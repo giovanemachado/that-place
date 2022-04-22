@@ -41,3 +41,18 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Background
+    uniqueID: 926609469
+    locked: 0
+  - name: Buildings Back
+    uniqueID: 898855117
+    locked: 0
+  - name: People
+    uniqueID: 2922757469
+    locked: 0
+  - name: Buildings Front
+    uniqueID: 2056273609
+    locked: 0
+  - name: Events
+    uniqueID: 631164817
+    locked: 0
