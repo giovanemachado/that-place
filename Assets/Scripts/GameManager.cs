@@ -35,8 +35,8 @@ public class GameManager : Singleton<GameManager>
     public int CoinBuildingCoinCost;
 
     int increasePeopleAmountByHouseBuilding = 5;
-    int increaseCoinAmountByCoinBuilding = 2;
-    int increaseHappinessAmountByFunBuilding = 5;
+    int increaseCoinAmountByCoinBuilding = 1;
+    int increaseHappinessAmountByFunBuilding = 1;
 
     int bonusCoinsByHappinessLevel5 = 4;
     int bonusCoinsByHappinessLevel4 = 3;
@@ -51,7 +51,7 @@ public class GameManager : Singleton<GameManager>
     [HideInInspector] public float FixBuildingPositionToInstantiateYAmount = 0.35f;
 
     public GameObject FirstBuildSpot;
-    
+
     int currentHouseBuildings = 0;
     int currentFunBuildings = 0;
     int currentCoinBuildings = 0;
@@ -72,6 +72,21 @@ public class GameManager : Singleton<GameManager>
 
     public GameObject EnvironmentBuildings;
 
+    // Gameplay Events
+    public struct GameplayEvent
+    {
+        public string description;
+        public EventType eventType;
+    }
+
+    [HideInInspector]
+    public enum EventType
+    {
+        SPEECH_BUBBLE,
+        WEATHER,
+        PEOPLE
+    }
+
     // Events
     public static event Action<BaseGameState> OnGameStateChange;
     public static event Action<bool> OnChangeIdle;
@@ -80,6 +95,10 @@ public class GameManager : Singleton<GameManager>
     public static event Action OnHouseBuildingBuilded;
     public static event Action OnFunBuildingBuilded;
     public static event Action OnCoinBuildingBuilded;
+
+    public static event Action<string> OnPlayerError;
+    public static event Action<GameplayEvent> OnGameplayEventAppears;
+
 
     void Start()
     {  
@@ -111,6 +130,7 @@ public class GameManager : Singleton<GameManager>
     // Happiness mechanic
     public void IncreaseHappiness(int amountOfHappiness)
     {
+        // Happiness bonus == 1 * fun buildings
         amountOfHappiness += increaseHappinessAmountByFunBuilding * currentFunBuildings;
 
         if (Happiness + amountOfHappiness <= maxHappiness)
@@ -145,6 +165,7 @@ public class GameManager : Singleton<GameManager>
     // Coins mechanic
     public void IncreaseCoins(int amountOfCoins)
     {
+        // Bonus == 1 * coin buildings + bonus coin by happiness
         amountOfCoins += increaseCoinAmountByCoinBuilding * currentCoinBuildings;
         amountOfCoins += BonusCoinsByHappiness();
 
@@ -172,7 +193,6 @@ public class GameManager : Singleton<GameManager>
 
     public bool HasCoinsToDoThis(int cost)
     {
-        Debug.Log(Coins);
         return Coins >= cost;
     }
 
@@ -271,5 +291,18 @@ public class GameManager : Singleton<GameManager>
 
         return currentBuildingsOfType + 1 <= maxBuildingsOfType;
     }
+
+    // Gameplay Events mechanic
+    public void InvokeOnGameplayEventAppears(GameplayEvent gameplayEvent)
+    {
+        OnGameplayEventAppears?.Invoke(gameplayEvent);
+    }
+
+    // General
+    public void InvokeOnPlayerErrorWithMessage(string error)
+    {
+        OnPlayerError?.Invoke(error);
+    }
+
 }
 

@@ -142,7 +142,6 @@ public class HUDManager : MonoBehaviour
     }
 
     public void ConfirmBuildingButtonPressed() {
-        Debug.Log("ConfirmBuildingButtonPressed");
         int cost = 0;
 
         if (buildingSelectedType == GameManager.BuildingType.HOUSE)
@@ -160,16 +159,17 @@ public class HUDManager : MonoBehaviour
             cost = GameManager.Instance.CoinBuildingCoinCost;
         }
 
+        if (!GameManager.Instance.HasCoinsToDoThis(cost))
+        {
+            GameManager.Instance.InvokeOnPlayerErrorWithMessage("I have no Coins for this now.");
+            return;
+        };
 
-        Debug.Log("checkings");
-        Debug.Log(!GameManager.Instance.HasCoinsToDoThis(cost));
-        Debug.Log(!GameManager.Instance.CanCreateBuilding(buildingSelectedType));
-        Debug.Log(cost);
-        Debug.Log(buildingSelectedType);
-
-        if (!GameManager.Instance.HasCoinsToDoThis(cost)) return;
-
-        if (!GameManager.Instance.CanCreateBuilding(buildingSelectedType)) return;
+        if (!GameManager.Instance.CanCreateBuilding(buildingSelectedType))
+        {
+            GameManager.Instance.InvokeOnPlayerErrorWithMessage("I have too much of this kind of buildings now.");
+            return;
+        };
 
         GameManager.Instance.AddABuildAndInvokeOnBuilding(buildingSelectedType);
         DeselectBuldingSpot();

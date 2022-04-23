@@ -5,8 +5,8 @@ using UnityEngine.UI;
 
 public class PlayingState : BaseGameState
 {
-    int decreaseHappinessAmountByTime = 1;
-    int timeToDecreaseHappiness = 12;
+    int decreaseHappinessAmountByTime = 10;
+    int timeToDecreaseHappiness = 30;
     float timerHappiness = 0.0f;
     int secondsHappiness = 0;
 
@@ -14,6 +14,9 @@ public class PlayingState : BaseGameState
     int timeToIncreaseCoins = 3;
     float timerCoins = 0.0f;
     int secondsCoins = 0;
+
+    float timerEvents = 0.0f;
+    int secondsEvents = 0;
 
     public override void EnterState(GameManager gameManager)
     {
@@ -28,7 +31,8 @@ public class PlayingState : BaseGameState
     public override void UpdateState(GameManager gameManager)
     {
         CheckDecreasingHappiness(gameManager);
-        CheckIncreasingMoney(gameManager);
+        // CheckIncreasingMoney(gameManager);
+        CheckForNewEvents(gameManager);
     }
 
     void CheckDecreasingHappiness(GameManager gameManager)
@@ -62,5 +66,11 @@ public class PlayingState : BaseGameState
             timerCoins = 0;
             GameManager.Instance.IncreaseCoins(increaseCoinsAmountByTime);
         }
+    }
+
+    void CheckForNewEvents(GameManager gameManager)
+    {
+        timerEvents += Time.deltaTime;
+        secondsEvents = (int)(timerEvents % 60);
     }
 }
