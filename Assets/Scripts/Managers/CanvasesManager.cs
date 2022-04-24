@@ -14,24 +14,11 @@ public class CanvasesManager : MonoBehaviour
     void Awake()
     {
         GameManager.OnGameStateChange += GameManagerOnGameStateChanged;
-        GameManager.OnChangeIdle += OnSomethingHappend;
     }
 
     void OnDestroy()
     {
         GameManager.OnGameStateChange -= GameManagerOnGameStateChanged;
-        GameManager.OnChangeIdle -= OnSomethingHappend; 
-    }
-
-    void OnSomethingHappend(bool isSomethingHappend)
-    {
-        if (isSomethingHappend)
-        {
-            SomethingHappend.SetActive(true);
-        } else
-        {
-            SomethingHappend.SetActive(false);
-        }
     }
 
     void GameManagerOnGameStateChanged(BaseGameState state)

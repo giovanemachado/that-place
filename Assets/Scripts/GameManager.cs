@@ -17,6 +17,11 @@ public class GameManager : Singleton<GameManager>
     public int People;
     int maxPeople = 50;
 
+    public GameObject PeopleGO;
+    public GameObject PeopleSpawner;
+    public GameObject EnvironmentPeople;
+    public List<GameObject> InstantiatedPeople = new List<GameObject>();
+
     [Header("Happiness")]
     [HideInInspector] public bool IsHappendAnInteraction;
     public int Happiness;
@@ -45,6 +50,7 @@ public class GameManager : Singleton<GameManager>
     int bonusCoinsByHappinessLevel1 = 0;
 
     [Header("Editor")]
+    public List<GameObject> InstantiatedBuildings = new List<GameObject>();
     public GameObject HouseBuilding;
     public GameObject FunBuilding;
     public GameObject CoinBuilding;
@@ -77,6 +83,12 @@ public class GameManager : Singleton<GameManager>
     {
         public string description;
         public EventType eventType;
+
+        public GameplayEvent(string description, EventType eventType)
+        {
+            this.description = description;
+            this.eventType = eventType;
+        }
     }
 
     [HideInInspector]
@@ -86,6 +98,18 @@ public class GameManager : Singleton<GameManager>
         WEATHER,
         PEOPLE
     }
+
+    [HideInInspector]
+    public enum SpeechBubbleType 
+    {
+        PERSON,
+        HOUSE_BUILDING,
+        FUN_BUILDING,
+        COIN_BUILDING
+    }
+
+    [HideInInspector] public GameObject SpeechBubbleSelected;
+
 
     // Events
     public static event Action<BaseGameState> OnGameStateChange;
@@ -98,6 +122,9 @@ public class GameManager : Singleton<GameManager>
 
     public static event Action<string> OnPlayerError;
     public static event Action<GameplayEvent> OnGameplayEventAppears;
+
+    public static event Action OnIncreasingPeople;
+    public static event Action OnObtainCoins;
 
 
     void Start()
@@ -169,6 +196,13 @@ public class GameManager : Singleton<GameManager>
         amountOfCoins += increaseCoinAmountByCoinBuilding * currentCoinBuildings;
         amountOfCoins += BonusCoinsByHappiness();
 
+        IncreaseCoinsWithoutBonus(amountOfCoins);
+
+        OnObtainCoins?.Invoke();
+    }
+
+    public void IncreaseCoinsWithoutBonus (int amountOfCoins)
+    {
         if (Coins + amountOfCoins <= maxCoins)
         {
             Coins += amountOfCoins;
@@ -217,6 +251,16 @@ public class GameManager : Singleton<GameManager>
         {
             People = maxPeople;
         }
+
+        OnIncreasingPeople?.Invoke();
+    }
+
+    public void InstantiatePeople()
+    {
+        GameObject newPerson = Instantiate(PeopleGO, PeopleSpawner.transform.position, Quaternion.identity);
+
+        newPerson.transform.parent = EnvironmentPeople.transform;
+        InstantiatedPeople.Add(newPerson);
     }
 
     // Building mechanic
@@ -233,11 +277,22 @@ public class GameManager : Singleton<GameManager>
 
         Quaternion rotation = Quaternion.identity;
 
+        var sprite = HouseBuilding.GetComponent<SpriteRenderer>();
+
+        if (CheckIfBuildingIsBack(EditingSpot.name))
+        {
+            sprite.sortingLayerName = "Buildings Front";
+        } else
+        {
+            sprite.sortingLayerName = "Buildings Back";
+        }
+
         if (buildingType == BuildingType.HOUSE)
         {
             DecreaseCoins(HouseBuildingCoinCost);
             currentHouseBuildings++;
             IncreasePeople(increasePeopleAmountByHouseBuilding);
+            InstantiatePeople();
             newBuilding = Instantiate(HouseBuilding, position, rotation);
             OnHouseBuildingBuilded?.Invoke();
         }
@@ -258,6 +313,7 @@ public class GameManager : Singleton<GameManager>
             OnCoinBuildingBuilded?.Invoke();
         }
 
+        InstantiatedBuildings.Add(newBuilding);
         newBuilding.transform.parent = EnvironmentBuildings.transform;
 
         EditingSpot.SetActive(false);
@@ -298,11 +354,76 @@ public class GameManager : Singleton<GameManager>
         OnGameplayEventAppears?.Invoke(gameplayEvent);
     }
 
+    public void InstantiateSpeechBubbleBuildingEvent()
+    {
+        List<GameObject> buildingsList = InstantiatedBuildings;
+        GameObject randomBuilding = buildingsList[UnityEngine.Random.Range(0, buildingsList.Count)];
+        GameObject speechBubble = randomBuilding.transform.GetChild(1).gameObject;
+
+        speechBubble.SetActive(true);
+
+        SpeechBubbleSelected = speechBubble;
+
+        StartCoroutine(FinishSpeechBubbleEvent(speechBubble));
+    }
+
+    public void InstantiateSpeechBubblePersonEvent()
+    {
+        List<GameObject> peopleList = InstantiatedPeople;
+        GameObject randomPerson = peopleList[UnityEngine.Random.Range(0, peopleList.Count)];
+        GameObject speechBubble = randomPerson.transform.GetChild(1).gameObject;
+
+        speechBubble.SetActive(true);
+
+        SpeechBubbleSelected = speechBubble;
+
+        StartCoroutine(FinishSpeechBubbleEvent(speechBubble));
+    }
+
+    IEnumerator FinishSpeechBubbleEvent(GameObject speechBubble)
+    {
+        yield return new WaitForSeconds(10);
+        speechBubble.SetActive(false);
+    }
+
+    public void InvokeOnClickSpeechBubble(GameObject speechBubble, SpeechBubbleType speechBubbleType)
+    {
+        bool isAHappinesSpeechBubble = speechBubbleType == SpeechBubbleType.PERSON || speechBubbleType == SpeechBubbleType.FUN_BUILDING;
+        bool isACoinSpeechBubble = speechBubbleType == SpeechBubbleType.HOUSE_BUILDING || speechBubbleType == SpeechBubbleType.COIN_BUILDING;
+
+        if (isAHappinesSpeechBubble)
+        {
+            IncreaseHappiness(1);
+        }
+
+        if (isACoinSpeechBubble)
+        {
+            IncreaseCoins(1);
+        }
+
+        speechBubble.SetActive(false);
+    }
+
     // General
-    public void InvokeOnPlayerErrorWithMessage(string error)
+    public void InvokeOnPlayerErrorWithMessage  (string error)
     {
         OnPlayerError?.Invoke(error);
     }
 
+    bool CheckIfBuildingIsBack(string buildingName)
+    {
+        bool resp = false;
+        string[] frontSpots = new string[] { "9", "10", "11", "12", "13", "14", "15", "16", "17" };
+        for(int i = 0; i < frontSpots.Length; i++)
+        {
+            if (buildingName.Contains(frontSpots[i]))
+            {
+                resp = true;
+                break;
+            }
+        }
+        
+        return resp;
+    }
 }
 

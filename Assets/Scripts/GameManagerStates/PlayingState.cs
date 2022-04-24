@@ -7,31 +7,47 @@ public class PlayingState : BaseGameState
 {
     int decreaseHappinessAmountByTime = 10;
     int timeToDecreaseHappiness = 30;
-    float timerHappiness = 0.0f;
+    float timerHappiness = 0;
     int secondsHappiness = 0;
 
     int increaseCoinsAmountByTime = 1;
     int timeToIncreaseCoins = 3;
-    float timerCoins = 0.0f;
+    float timerCoins = 0;
     int secondsCoins = 0;
 
-    float timerEvents = 0.0f;
-    int secondsEvents = 0;
+    float timerPersonEvents = 0;
+    int secondsPersonEvents = 0;
+
+    float timerBuildingEvents = 0;
+    int secondsBuildingEvents = 0;
+
+    int timingForNewPersonEvents = 1;
+    int timingForNewBuildingEvents = 1;
 
     public override void EnterState(GameManager gameManager)
     {
+        GameManager gameManagerInstance = GameManager.Instance;
+
         // First building 
-        Vector3 position = GameManager.Instance.FirstBuildSpot.transform.position;
-        position.y += GameManager.Instance.FixBuildingPositionToInstantiateYAmount;
+        Vector3 position = gameManagerInstance.FirstBuildSpot.transform.position;
+        position.y += gameManagerInstance.FixBuildingPositionToInstantiateYAmount;
         Quaternion rotation = Quaternion.identity;
-        GameManager.Instantiate(GameManager.Instance.HouseBuilding, position, rotation);
-        GameManager.Instance.FirstBuildSpot.SetActive(false);
+        GameObject firstBuilding = GameManager.Instantiate(gameManagerInstance.HouseBuilding, position, rotation);
+        gameManagerInstance.FirstBuildSpot.SetActive(false);
+        firstBuilding.transform.parent = gameManagerInstance.EnvironmentBuildings.transform;
+        gameManagerInstance.InstantiatedBuildings.Add(firstBuilding);
+
+        var sprite = firstBuilding.GetComponent<SpriteRenderer>();
+        sprite.sortingLayerName = "Buildings Back";
+
+        // First people
+        gameManagerInstance.InstantiatePeople();
     }
 
     public override void UpdateState(GameManager gameManager)
     {
         CheckDecreasingHappiness(gameManager);
-        // CheckIncreasingMoney(gameManager);
+        CheckIncreasingMoney(gameManager);
         CheckForNewEvents(gameManager);
     }
 
@@ -64,13 +80,30 @@ public class PlayingState : BaseGameState
         if (secondsCoins >= timeToIncreaseCoins)
         {
             timerCoins = 0;
-            GameManager.Instance.IncreaseCoins(increaseCoinsAmountByTime);
+            GameManager.Instance.IncreaseCoinsWithoutBonus(increaseCoinsAmountByTime);
         }
     }
 
     void CheckForNewEvents(GameManager gameManager)
     {
-        timerEvents += Time.deltaTime;
-        secondsEvents = (int)(timerEvents % 60);
+        timerPersonEvents += Time.deltaTime;
+        secondsPersonEvents = (int)(timerPersonEvents % 60);
+
+        timerBuildingEvents += Time.deltaTime;
+        secondsBuildingEvents = (int)(timerBuildingEvents % 60);
+
+        if (secondsPersonEvents > timingForNewPersonEvents)
+        {
+            timerPersonEvents = 0;
+            GameManager.Instance.InstantiateSpeechBubblePersonEvent();
+            timingForNewPersonEvents = UnityEngine.Random.Range(15, 25);
+        }
+
+        if (secondsBuildingEvents > timingForNewBuildingEvents)
+        {
+            timerBuildingEvents = 0;
+            GameManager.Instance.InstantiateSpeechBubbleBuildingEvent();
+            timingForNewBuildingEvents = UnityEngine.Random.Range(15, 25);
+        }
     }
 }

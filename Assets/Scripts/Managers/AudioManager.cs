@@ -8,6 +8,9 @@ public class AudioManager : MonoBehaviour
     public AudioClip MainMenuMusic;
     public AudioClip GameplayMusic;
 
+    public AudioClip HappinessSound;
+    public AudioClip CoinSound;
+
     Animator musicFadeAnimator;
 
     void Awake()
@@ -16,11 +19,15 @@ public class AudioManager : MonoBehaviour
         musicFadeAnimator = gameObject.GetComponent<Animator>();
 
         GameManager.OnGameStateChange += gameStateMusic;
+        GameManager.OnIncreasingPeople += OnIncreasingPeopleSound;
+        GameManager.OnObtainCoins += OnObtainCoinsSound;
     }
 
     void OnDestroy()
     {
         GameManager.OnGameStateChange -= gameStateMusic;
+        GameManager.OnIncreasingPeople -= OnIncreasingPeopleSound;
+        GameManager.OnObtainCoins -= OnObtainCoinsSound;
     }
 
     // Start is called before the first frame update
@@ -51,5 +58,15 @@ public class AudioManager : MonoBehaviour
         musicFadeAnimator.SetTrigger("fadeIn");
         audioMain.clip = music;
         audioMain.Play();
+    }
+
+    void OnIncreasingPeopleSound()
+    {
+        audioMain.PlayOneShot(HappinessSound);
+    }
+
+    void OnObtainCoinsSound ()
+    {
+        audioMain.PlayOneShot(CoinSound);
     }
 }
