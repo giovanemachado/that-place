@@ -17,11 +17,7 @@ public class HUDManager : MonoBehaviour
     [Header("Editor")]
     public GameObject Editor;
 
-    public TextMeshProUGUI EditorTitleText;
-    string editorTitleDefault = "Editor";
-
     public TextMeshProUGUI BuildingTypeText;
-    string buildingTypeDefault = "Building type:";
 
     string buildingTypeHouse = "House";
     string buildingTypeFunBuilding = "Fun Building";
@@ -59,22 +55,9 @@ public class HUDManager : MonoBehaviour
         CoinsText.text = $"{coinsDefaultText} {GameManager.Instance.Coins}";
     }
 
-    public void PauseButtonPressed()
-    {
-        GameManager.Instance.SwitchState(GameManager.Instance.PausedState);
-    }
-
-    public void SomethingButtonPressed()
-    {
-        GameManager.Instance.InvokeOnSomeInteraction(true);
-        // GameManager.Instance.IncreasePeople(5);
-    }
-
     public void GameManagerOnClickBuildingSpot(GameObject buildingSpot)
     {
         DeselectBuldingSpot();
-
-        EditorTitleText.text = $"Building Spot {editorTitleDefault}";
 
         SpriteRenderer sprite = buildingSpot.GetComponent<SpriteRenderer>();
         sprite.color = SelectedBuildingSpot;
@@ -98,9 +81,8 @@ public class HUDManager : MonoBehaviour
         SpriteRenderer sprite = buildingSpot.GetComponent<SpriteRenderer>();
         sprite.color = UnselectedBuildingSpot;
 
-        EditorTitleText.text = $"{editorTitleDefault}";
 
-        BuildingTypeText.text = $"{buildingTypeDefault}";
+        BuildingTypeText.text = "";
         DescriptionBuildingText.text = "";
 
         ShouldShowConfirmCancelBuildingButton(false);
@@ -110,7 +92,7 @@ public class HUDManager : MonoBehaviour
 
     public void HouseEditorButtonPressed()
     {
-        BuildingTypeText.text = $"{buildingTypeDefault} {buildingTypeHouse}";
+        BuildingTypeText.text = $"{buildingTypeHouse}";
         DescriptionBuildingText.text = $"{descriptionBuildingDefault} {buildingTypeHouseDescription}";
         buildingSelectedType = GameManager.BuildingType.HOUSE;
 
@@ -119,7 +101,7 @@ public class HUDManager : MonoBehaviour
 
     public void FunEditorButtonPressed()
     {
-        BuildingTypeText.text = $"{buildingTypeDefault} {buildingTypeFunBuilding}";
+        BuildingTypeText.text = $"{buildingTypeFunBuilding}";
         DescriptionBuildingText.text = $"{descriptionBuildingDefault} {buildingTypeFunBuildingDescription}";
         buildingSelectedType = GameManager.BuildingType.FUN;
 
@@ -128,7 +110,7 @@ public class HUDManager : MonoBehaviour
 
     public void CoinEditorButtonPressed()
     {
-        BuildingTypeText.text = $"{buildingTypeDefault} {buildingTypeCoinBuilding}";
+        BuildingTypeText.text = $"{buildingTypeCoinBuilding}";
         DescriptionBuildingText.text = $"{descriptionBuildingDefault} {buildingTypeCoinBuildingDescription}";
         buildingSelectedType = GameManager.BuildingType.COIN;
 
@@ -179,7 +161,7 @@ public class HUDManager : MonoBehaviour
 
     public void CancelBuildingButtonPressed()
     {
-        BuildingTypeText.text = $"{buildingTypeDefault}";
+        BuildingTypeText.text = "";
         DescriptionBuildingText.text = "";
 
         ShouldShowConfirmCancelBuildingButton(false);

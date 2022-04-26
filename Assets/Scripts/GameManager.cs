@@ -9,8 +9,10 @@ public class GameManager : Singleton<GameManager>
 
     [HideInInspector] public MainMenuState MainMenuState = new MainMenuState();
     [HideInInspector] public PlayingState PlayingState = new PlayingState();
-    [HideInInspector] public PausedState PausedState = new PausedState();
+    [HideInInspector] public LoreState LoreState = new LoreState();
     [HideInInspector] public QuitState QuitState = new QuitState();
+
+    public GameObject LoreManager;
 
     // Gameplay variables
     [Header("People")]
@@ -50,7 +52,7 @@ public class GameManager : Singleton<GameManager>
     int bonusCoinsByHappinessLevel1 = 0;
 
     [Header("Editor")]
-    public List<GameObject> InstantiatedBuildings = new List<GameObject>();
+    [HideInInspector] public List<GameObject> InstantiatedBuildings = new List<GameObject>();
     public GameObject HouseBuilding;
     public GameObject FunBuilding;
     public GameObject CoinBuilding;
@@ -126,6 +128,12 @@ public class GameManager : Singleton<GameManager>
     public static event Action OnIncreasingPeople;
     public static event Action OnObtainCoins;
 
+
+    // Assets
+    public List<Sprite> housesSprites = new List<Sprite>();
+    public List<Sprite> funSprites = new List<Sprite>();
+    public List<Sprite> coinSprites = new List<Sprite>();
+    public List<Sprite> peopleSprites = new List<Sprite>();
 
     void Start()
     {  
@@ -257,6 +265,10 @@ public class GameManager : Singleton<GameManager>
 
     public void InstantiatePeople()
     {
+        GameObject ChildGameObject1 = PeopleGO.transform.GetChild(0).gameObject;
+        var sprite = ChildGameObject1.GetComponent<SpriteRenderer>();
+        sprite.sprite = peopleSprites[UnityEngine.Random.Range(0, peopleSprites.Count)];
+
         GameObject newPerson = Instantiate(PeopleGO, PeopleSpawner.transform.position, Quaternion.identity);
 
         newPerson.transform.parent = EnvironmentPeople.transform;
@@ -277,22 +289,18 @@ public class GameManager : Singleton<GameManager>
 
         Quaternion rotation = Quaternion.identity;
 
-        var sprite = HouseBuilding.GetComponent<SpriteRenderer>();
-
-        if (CheckIfBuildingIsBack(EditingSpot.name))
-        {
-            sprite.sortingLayerName = "Buildings Front";
-        } else
-        {
-            sprite.sortingLayerName = "Buildings Back";
-        }
-
         if (buildingType == BuildingType.HOUSE)
         {
             DecreaseCoins(HouseBuildingCoinCost);
             currentHouseBuildings++;
             IncreasePeople(increasePeopleAmountByHouseBuilding);
+
             InstantiatePeople();
+
+            var sprite = HouseBuilding.GetComponent<SpriteRenderer>();
+            sprite.sortingLayerName = CheckIfBuildingIsBack(EditingSpot.name) ? "Buildings Front" : "Buildings Back";
+            sprite.sprite = housesSprites[UnityEngine.Random.Range(0, housesSprites.Count)];
+
             newBuilding = Instantiate(HouseBuilding, position, rotation);
             OnHouseBuildingBuilded?.Invoke();
         }
@@ -300,6 +308,11 @@ public class GameManager : Singleton<GameManager>
         if (buildingType == BuildingType.FUN)
         {
             DecreaseCoins(FunBuildingCoinCost);
+            
+            var sprite = FunBuilding.GetComponent<SpriteRenderer>();
+            sprite.sortingLayerName = CheckIfBuildingIsBack(EditingSpot.name) ? "Buildings Front" : "Buildings Back";
+            sprite.sprite = funSprites[currentFunBuildings];
+
             currentFunBuildings++;
             newBuilding = Instantiate(FunBuilding, position, rotation);
             OnFunBuildingBuilded?.Invoke();
@@ -308,6 +321,11 @@ public class GameManager : Singleton<GameManager>
         if (buildingType == BuildingType.COIN)
         {
             DecreaseCoins(CoinBuildingCoinCost);
+
+            var sprite = CoinBuilding.GetComponent<SpriteRenderer>();
+            sprite.sortingLayerName = CheckIfBuildingIsBack(EditingSpot.name) ? "Buildings Front" : "Buildings Back";
+            sprite.sprite = funSprites[currentCoinBuildings];
+
             currentCoinBuildings++;
             newBuilding = Instantiate(CoinBuilding, position, rotation);
             OnCoinBuildingBuilded?.Invoke();
@@ -358,7 +376,7 @@ public class GameManager : Singleton<GameManager>
     {
         List<GameObject> buildingsList = InstantiatedBuildings;
         GameObject randomBuilding = buildingsList[UnityEngine.Random.Range(0, buildingsList.Count)];
-        GameObject speechBubble = randomBuilding.transform.GetChild(1).gameObject;
+        GameObject speechBubble = randomBuilding.transform.GetChild(0).gameObject;
 
         speechBubble.SetActive(true);
 

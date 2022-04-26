@@ -34,7 +34,8 @@ public class AudioManager : MonoBehaviour
     void Start()
     {
         audioMain.clip = MainMenuMusic;
-        GetComponent<AudioSource>().Play();
+        //audioMain.volume = 0;
+        //GetComponent<AudioSource>().Play();
     }
 
     void gameStateMusic(BaseGameState gameState)
@@ -45,7 +46,7 @@ public class AudioManager : MonoBehaviour
             audioMain.Play();
         }
 
-        if (gameState == GameManager.Instance.PlayingState)
+        if (gameState == GameManager.Instance.LoreState)
         {
             StartCoroutine(changeMusic(GameplayMusic));
         }
@@ -54,7 +55,7 @@ public class AudioManager : MonoBehaviour
     IEnumerator changeMusic(AudioClip music)
     {
         musicFadeAnimator.SetTrigger("fadeOut");
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(1);
         musicFadeAnimator.SetTrigger("fadeIn");
         audioMain.clip = music;
         audioMain.Play();

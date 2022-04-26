@@ -6,10 +6,8 @@ using UnityEngine;
 public class CanvasesManager : MonoBehaviour
 {
     public GameObject MainMenuCanvas;
-    public GameObject PausedMenuCanvas;
     public GameObject HUDCanvas;
-
-    public GameObject SomethingHappend;
+    public GameObject LoreCanvas;
      
     void Awake()
     {
@@ -25,6 +23,6 @@ public class CanvasesManager : MonoBehaviour
     {
         MainMenuCanvas.SetActive(state == GameManager.Instance.MainMenuState);
         HUDCanvas.SetActive(state == GameManager.Instance.PlayingState);
-        PausedMenuCanvas.SetActive(state == GameManager.Instance.PausedState);
+        LoreCanvas.SetActive(state == GameManager.Instance.LoreState);
     }
 }

@@ -39,6 +39,8 @@ public class PlayingState : BaseGameState
 
         var sprite = firstBuilding.GetComponent<SpriteRenderer>();
         sprite.sortingLayerName = "Buildings Back";
+        sprite.sprite = gameManagerInstance.housesSprites[UnityEngine.Random.Range(0, gameManagerInstance.housesSprites.Count)];
+
 
         // First people
         gameManagerInstance.InstantiatePeople();
