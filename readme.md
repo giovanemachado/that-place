@@ -42,7 +42,11 @@ I have kept the game jam theme (Urban) and used the idea of a small-town city-bu
 This was a 48h project for Admix Spring Game Jam (https://itch.io/jam/admix-spring-game-jam), so most of the code does not has good refactoring or tests.
 
 <h2 id="#credits"> Credits</h2>
+
 <a href="https://github.com/giovanemachado"> Giovane Machado </a> - game design and game development
+
 <a href="https://lucialarezza.co.uk/"> Lucia La Rezza</a> - music and sound design
+
 <a href="https://www.behance.net/gabiribeiro"> Gabriela Ribeiro </a> - game art and UI
+
 
