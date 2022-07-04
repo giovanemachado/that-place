@@ -39,7 +39,7 @@ Download the game here: https://lucialarezza.itch.io/thatplacecalledhome
 I have kept the game jam theme (Urban) and used the idea of a small-town city-building game. Inspired by Sim City and Kings Is Me, I tried to explore this kind of experience, where you need to keep to create a city but in a small and cute way, instead of big cities (as in common city building games).
 
 <h2 id="#game-development"> Game development</h2>
-This was a 48h project for Admix Spring Game (https://itch.io/jam/admix-spring-game-jam), so most of the code does not has good refactoring or tests.
+This was a 48h project for Admix Spring Game Jam (https://itch.io/jam/admix-spring-game-jam), so most of the code does not has good refactoring or tests.
 
 <h2 id="#credits"> Credits</h2>
 <a href="https://github.com/giovanemachado"> Giovane Machado </a> - game design and game development
